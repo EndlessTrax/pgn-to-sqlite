@@ -1,2 +1,4 @@
 .venv/
-*.sqlite3
+*.db
+.vscode/
+.pytest_cache/
