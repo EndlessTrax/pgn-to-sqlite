@@ -1,9 +1,11 @@
 import re
 import click
 import requests
+import berserk
 
 
 CHESS_DOTCOM_ARCHIVES_URL = "https://api.chess.com/pub/player/{}/games/archives"
+LICHESS_GAMES_URL = "https://lichess.org/api/games/user/{}"
 
 
 def convert_to_snake_case(value: str) -> str:
@@ -57,7 +59,7 @@ def main(site, user, output):
     """"""
 
     if site == "chess":
-        r = requests.get(CHESS_DOTCOM_ARCHIVES_URL.format("endlesstrax"))
+        r = requests.get(CHESS_DOTCOM_ARCHIVES_URL.format(user))
         archive_urls = r.json()["archives"]
 
         for url in archive_urls:
@@ -65,6 +67,14 @@ def main(site, user, output):
 
             for game in archived_games:
                 print(build_pgn_dict(game["pgn"]))
+
+    elif site == "lichess":
+        client = berserk.Client()
+        r = client.games.export_by_player(user, as_pgn=True)
+        games = list(r)
+
+        for game in games:
+            print(build_pgn_dict((game)))
 
 
 if __name__ == "__main__":
