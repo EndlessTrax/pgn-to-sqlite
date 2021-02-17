@@ -4,12 +4,8 @@ import requests
 import berserk
 
 
-CHESS_DOTCOM_ARCHIVES_URL = "https://api.chess.com/pub/player/{}/games/archives"
-LICHESS_GAMES_URL = "https://lichess.org/api/games/user/{}"
-
-
 def convert_to_snake_case(value: str) -> str:
-    """"""
+    """Convert any camal case attribute name to snake case"""
     return re.compile(r"(.)([A-Z][a-z]+)").sub(r"\1_\2", value).lower()
 
 
@@ -56,10 +52,14 @@ def build_pgn_dict(pgn: str) -> dict:
     help="Where you would like your database saved?",
 )
 def main(site, user, output):
-    """"""
+    """
+    Which SITE do you want to download your games from?
+    You can download games from chess.com or lichess.org.\n
+    OPTIONS:    1) chess    2) lichess
+    """
 
     if site == "chess":
-        r = requests.get(CHESS_DOTCOM_ARCHIVES_URL.format(user))
+        r = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
         archive_urls = r.json()["archives"]
 
         for url in archive_urls:
