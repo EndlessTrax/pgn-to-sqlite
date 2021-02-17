@@ -55,7 +55,7 @@ def main(site, user, output):
     """
     Which SITE do you want to download your games from?
     You can download games from chess.com or lichess.org.\n
-    OPTIONS:    1) chess    2) lichess
+    ARGS:    chess    OR     lichess
     """
 
     if site == "chess":
