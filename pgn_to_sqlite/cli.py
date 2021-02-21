@@ -1,40 +1,7 @@
-import re
 import click
 import requests
 import berserk
-
-
-def convert_to_snake_case(value: str) -> str:
-    """Convert any camal case attribute name to snake case"""
-    return re.compile(r"(.)([A-Z][a-z]+)").sub(r"\1_\2", value).lower()
-
-
-def build_pgn_dict(pgn: str) -> dict:
-    """"""
-    game_dict = dict()
-    pgn_lines = pgn.split("\n")
-
-    for line in pgn_lines:
-        if line.startswith("["):
-
-            key_pattern = re.compile(r"([^\s]+)")
-            value_pattern = re.compile(r"\"(.+?)\"")
-
-            key = convert_to_snake_case(
-                re.search(key_pattern, line).group().lstrip("[")
-            )
-
-            value = re.search(value_pattern, line)
-
-            if value is not None:
-                game_dict[key] = value.group().strip('"')
-            else:
-                game_dict[key] = ""
-
-        elif line.startswith("1."):
-            game_dict["moves"] = line
-
-    return game_dict
+import helpers
 
 
 @click.command()
@@ -58,23 +25,34 @@ def main(site, user, output):
     ARGS:    chess    OR     lichess
     """
 
+    # TODO: Add check for if db exists.
+    CONN = helpers.create_db_connection(output)
+    helpers.create_games_table(CONN)
+
     if site == "chess":
-        r = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
-        archive_urls = r.json()["archives"]
+        req = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
+        archive_urls = req.json()["archives"]
 
         for url in archive_urls:
             archived_games = requests.get(url).json()["games"]
 
             for game in archived_games:
-                print(build_pgn_dict(game["pgn"]))
+                pgn = helpers.build_pgn_dict(game["pgn"])
+                query = helpers.save_game_to_db(pgn)
+                helpers.execute_query(CONN, query)
 
     elif site == "lichess":
         client = berserk.Client()
-        r = client.games.export_by_player(user, as_pgn=True)
-        games = list(r)
+        req = client.games.export_by_player(user, as_pgn=True)
+        games = list(req)
 
         for game in games:
-            print(build_pgn_dict((game)))
+            pgn = helpers.build_pgn_dict((game))
+            query = helpers.save_game_to_db(pgn)
+            helpers.execute_query(CONN, query)
+
+    # Close DB connection before extiing the application
+    CONN.close()
 
 
 if __name__ == "__main__":
