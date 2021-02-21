@@ -92,17 +92,23 @@ def fetch_chess_dotcom_games(user: str) -> list:
     """TODO:"""
     req = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
     archive_urls = req.json()["archives"]
-
+    games_list = list()
+    
     for url in archive_urls:
         archived_games = requests.get(url).json()["games"]
+        
+        for game in archived_games:
+            games_list.append(game)
 
-    return archived_games
+    print(f"INFO:    Total games imported from chess.com = {len(games_list)}")
+    return games_list
 
 
 def fetch_lichess_org_games(user: str) -> list:
     """TODO:"""
     client = berserk.Client()
     req = client.games.export_by_player(user, as_pgn=True)
-    games = list(req)
+    games_list = list(req)
 
-    return games
+    print(f"INFO:    Total games imported from lichess.org = {len(games_list)}")
+    return games_list
