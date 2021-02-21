@@ -62,21 +62,30 @@ def main(site, user, output):
 
     db.connect()
     db.create_tables([Game])
+    print("INFO:    Created database and Games table")
 
     if site == "chess":
+        print(f"INFO:    Fetching games for {user} from chess.com")
+
         games = fetch_chess_dotcom_games(user)
         for game in games:
             pgn = build_pgn_dict(game["pgn"])
             save_game_to_db(Game, pgn)
 
     elif site == "lichess":
+        print(f"INFO:    Fetching games for {user} from lichess.org")
+
         games = fetch_lichess_org_games(user)
         for game in games:
             pgn = build_pgn_dict(game)
             save_game_to_db(Game, pgn)
 
     else:
-        raise ValueError("That is not a valid site name. Check --help for valid inputs")
+        raise ValueError(
+            f"'{site}' is not a valid site name. Check --help for valid inputs"
+        )
+
+    print(f"INFO:    Games saved to {output}")
 
 
 if __name__ == "__main__":
