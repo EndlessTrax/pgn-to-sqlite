@@ -1,7 +1,7 @@
 import click
 from peewee import *
 
-from pgn_to_sqlite.helpers import (
+from helpers import (
     fetch_chess_dotcom_games,
     fetch_lichess_org_games,
     build_pgn_dict,
