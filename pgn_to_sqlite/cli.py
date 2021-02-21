@@ -1,7 +1,12 @@
 import click
-import requests
-import berserk
-import helpers
+from peewee import *
+
+from pgn_to_sqlite.helpers import (
+    fetch_chess_dotcom_games,
+    fetch_lichess_org_games,
+    build_pgn_dict,
+    save_game_to_db,
+)
 
 
 @click.command()
@@ -15,6 +20,8 @@ import helpers
 @click.option(
     "-o",
     "--output",
+    type=click.Path(file_okay=True, dir_okay=False, allow_dash=False),
+    required=True,
     prompt="Output path of the database...",
     help="Where you would like your database saved?",
 )
@@ -25,34 +32,51 @@ def main(site, user, output):
     ARGS:    chess    OR     lichess
     """
 
-    # TODO: Add check for if db exists.
-    CONN = helpers.create_db_connection(output)
-    helpers.create_games_table(CONN)
+    db = SqliteDatabase(output)
+
+    class Game(Model):
+        """Main Game model
+
+        All field are currently strings. May change in the future and convert
+        some to native data structures
+        """
+
+        event = CharField()
+        site = CharField()
+        date = CharField()
+        round = CharField()
+        white = CharField()
+        black = CharField()
+        result = CharField()
+        eco = CharField()
+        utc_date = CharField()
+        utc_time = CharField()
+        white_elo = CharField()
+        black_elo = CharField()
+        variant = CharField()
+        time_control = CharField()
+        termination = CharField()
+
+        class Meta:
+            database = db
+
+    db.connect()
+    db.create_tables([Game])
 
     if site == "chess":
-        req = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
-        archive_urls = req.json()["archives"]
-
-        for url in archive_urls:
-            archived_games = requests.get(url).json()["games"]
-
-            for game in archived_games:
-                pgn = helpers.build_pgn_dict(game["pgn"])
-                query = helpers.save_game_to_db(pgn)
-                helpers.execute_query(CONN, query)
+        games = fetch_chess_dotcom_games(user)
+        for game in games:
+            pgn = build_pgn_dict(game["pgn"])
+            save_game_to_db(Game, pgn)
 
     elif site == "lichess":
-        client = berserk.Client()
-        req = client.games.export_by_player(user, as_pgn=True)
-        games = list(req)
-
+        games = fetch_lichess_org_games(user)
         for game in games:
-            pgn = helpers.build_pgn_dict((game))
-            query = helpers.save_game_to_db(pgn)
-            helpers.execute_query(CONN, query)
+            pgn = build_pgn_dict(game)
+            save_game_to_db(Game, pgn)
 
-    # Close DB connection before extiing the application
-    CONN.close()
+    else:
+        raise ValueError("That is not a valid site name. Check --help for valid inputs")
 
 
 if __name__ == "__main__":
