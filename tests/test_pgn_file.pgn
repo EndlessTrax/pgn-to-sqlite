@@ -1,0 +1,17 @@
+[Event "Live Chess"]
+[Site "Chess.com"]
+[Date "2021.01.21"]
+[Round "-"]
+[White "EndlessTrax"]
+[Black "Roockie4Life"]
+[Result "1-0"]
+[WhiteElo "1189"]
+[BlackElo "1244"]
+[TimeControl "900+10"]
+[EndTime "13:13:28 PST"]
+[Termination "EndlessTrax won by checkmate"]
+
+1. d4 f5 2. Bf4 Nf6 3. e3 g6 4. Nf3 Bg7 5. c3 O-O 6. Bc4+ Kh8 7. Nbd2 c6 8. h3
+d5 9. Bd3 Nbd7 10. Bg3 b6 11. Ng5 Nb8 12. h4 c5 13. Qc2 cxd4 14. exd4 Qd6 15.
+Bxd6 exd6 16. O-O-O Nc6 17. a3 a5 18. h5 gxh5 19. Bxf5 Bxf5 20. Qxf5 Ne4 21.
+Qxh7# 1-0
