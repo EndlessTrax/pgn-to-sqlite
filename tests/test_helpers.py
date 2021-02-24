@@ -7,7 +7,7 @@ def test_snake_case_conversion():
 
 
 def test_build_png_dict():
-    with open('tests/test_pgn_file.pgn', 'r') as f:
+    with open("tests/test_pgn_file.pgn", "r") as f:
         pgn_str = f.read()
         result = build_pgn_dict(pgn_str)
 
