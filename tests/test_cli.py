@@ -8,13 +8,22 @@ def test_snake_case_conversion():
     assert result == "spam_spam"
 
 
-def test_build_png_dict():
-    with open("tests/test_pgn_file.pgn", "r") as f:
+def test_build_png_dict_from_chess_dotcom():
+    with open("tests/test_pgn_file_chess_dotcom.pgn", "r") as f:
         pgn_str = f.read()
         result = build_pgn_dict(pgn_str)
 
     assert result["white"] == "EndlessTrax"
     assert result["termination"] == "EndlessTrax won by checkmate"
+
+
+def test_build_png_dict_from_lichess():
+    with open("tests/test_pgn_file_lichess.pgn", "r") as f:
+        pgn_str = f.read()
+        result = build_pgn_dict(pgn_str)
+
+    assert result["black"] == "endlesstrax"
+    assert result["opening"] == "Sicilian Defense: Old Sicilian"
 
 
 def test_chess_dotcom_api_endpoint():
