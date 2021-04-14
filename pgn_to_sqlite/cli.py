@@ -11,6 +11,7 @@ def convert_to_snake_case(value: str) -> str:
     
     Args:
         value: The key to be converted to snake case
+        
     Returns:
         The converted key
     """
@@ -131,6 +132,7 @@ def fetch_lichess_org_games(user: str) -> list:
     
     Args:
         user: A lichess username
+
     Returns:
         list: A list of all games for that user.
     """
