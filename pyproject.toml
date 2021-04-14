@@ -3,7 +3,7 @@ requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]
-module = "pgn_to_sqlite"
+module = "pgn-to-sqlite"
 author = "Ricky White"
 author-email = "ricky@whitelionmedia.com"
 home-page = "https://github.com/EndlessTrax/pgn-to-sqlite"
@@ -21,4 +21,4 @@ Documentation = "https://github.com/EndlessTrax/pgn-to-sqlite/blob/master/README
 Issues = "https://github.com/EndlessTrax/pgn-to-sqlite/issues"
 
 [tool.flit.scripts]
-pyanchor = "pgn-to-sqlite.cli:main"
+pgn-to-sqlite = "pgn_to_sqlite.cli:main"
