@@ -1,0 +1,21 @@
+[Event "Rated Correspondence game"]
+[Site "https://lichess.org/u0SmP3rV"]
+[Date "2021.03.30"]
+[White "philcorn"]
+[Black "endlesstrax"]
+[Result "0-1"]
+[UTCDate "2021.03.30"]
+[UTCTime "11:31:59"]
+[WhiteElo "1847"]
+[BlackElo "1804"]
+[WhiteRatingDiff "-6"]
+[BlackRatingDiff "+47"]
+[Variant "Standard"]
+[TimeControl "-"]
+[ECO "B30"]
+[Opening "Sicilian Defense: Old Sicilian"]
+[Termination "Normal"]
+
+1. e4 c5 2. Nf3 Nc6 3. Bc4 e6 4. Nc3 Nf6 5. a3 Be7 6. d3 O-O 7. O-O d5 8. exd5 exd5 9. Ba2 Be6 10. Ne2 Qc7 11. Ng3 Rfe8 12. Re1 Rad8 13. Bd2 b5 14. Qc1 c4 15. Bf4 Qb7 16. dxc4 dxc4 17. b3 cxb3 18. cxb3 Bd6 19. Bxd6 Rxd6 20. b4 Nd4 21. Nxd4 Rxd4 22. Bxe6 Rxe6 23. Nf5 Rg4 24. Ne3 Rxe3 25. f3 Rxe1+ 26. Qxe1 Qb6+ 27. Kh1 Rc4 28. Ra2 g6 29. h3 Qc6 30. Rd2 Rc3 31. Qe5 Kg7 32. Rd6 Rc1+ 33. Kh2 Qc3 34. Qxb5 Qxa3 35. Ra6 Qe3 36. Qb8 Qg1+ 37. Kg3 Nh5+ 38. Kh4 Rc4+ 39. f4 Qf2+ 40. Kg4 Qg3# 0-1
+
+
