@@ -12,13 +12,13 @@ A cli application for pulling pgn files from Chess.com and Lichess.org and putti
 MacOS / Linux:
 
 ```bash
-python3 -m pip install pgn-to-sqlite
+python3 -m pip install pgn_to_sqlite
 ```
 
 Windows:
 
 ```powershell
-python -m pip install pgn-to-sqlite
+python -m pip install pgn_to_sqlite
 ```
 
 ## Usage
