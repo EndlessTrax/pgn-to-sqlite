@@ -7,73 +7,65 @@ import requests
 
 
 def convert_to_snake_case(value: str) -> str:
-    """Convert any camel case attribute name to snake case"""
+    """Convert any camel case attribute name to snake case
+    
+    Args:
+        value: The key to be converted to snake case
+    Returns:
+        The converted key
+    """
     return re.compile(r"(.)([A-Z][a-z]+)").sub(r"\1_\2", value).lower()
 
 
-def build_pgn_dict(pgn: str) -> dict:
-    """Takes any pgn text file and coverts to a dictionary object
-
-    All pgn tags are converted to snake case. After converting, the dictionary
-    is checked against a tuple of expected keys, and if missing, adds them with
-    and empty string value. This ensures that each dictionary is uniform to
-    match the database table.
+def create_db_connection(path: str):
+    """Creates the main database connection object
+    
+    Args:
+        path: The path of the database (current or to be created)
+    
+    Returns:
+        connection: A database connection object
     """
-    game_dict = dict()
-    pgn_lines = pgn.split("\n")
+    connection = None
+    try:
+        connection = sqlite3.connect(path)
+        print("INFO:    Connection to DB successful")
+    except sqlite3.Error as e:
+        print(f"ERROR:   The error '{e}' occurred")
 
-    for line in pgn_lines:
-        if line.startswith("["):
-
-            key_pattern = re.compile(r"([^\s]+)")
-            value_pattern = re.compile(r"\"(.+?)\"")
-
-            key = convert_to_snake_case(
-                re.search(key_pattern, line).group().lstrip("[")
-            )
-
-            value = re.search(value_pattern, line)
-
-            if value is not None:
-                game_dict[key] = value.group().strip('"')
-            else:
-                game_dict[key] = ""
-
-        # The move notation is a single line in the pgn.
-        # The whole move notation is added to a single key:value
-        elif line.startswith("1."):
-            game_dict["moves"] = line
-
-    expected_keys = (
-        "event",
-        "site",
-        "date",
-        "round",
-        "white",
-        "black",
-        "result",
-        "eco",
-        "white_elo",
-        "black_elo",
-        "variant",
-        "time_control",
-        "termination",
-        "moves",
-    )
-
-    # If an expected key isn't present in the dictionary representation of the 
-    # pgn, then it is added with an empty string as its value.
-    for key in expected_keys:
-        if key not in game_dict:
-            game_dict[key] = ""
-
-    return game_dict
+    return connection
 
 
-def save_game_to_db(conn, pgn: dict) -> None:
-    """TODO:"""
+def execute_db_query(connection, query: str) -> None:
+    """Executes a SQL query on the Sqlite3 database
+    
+    Args:
+        connection: A database connection object
+        query: The SQL query as a string 
+    
+    Returns: 
+        Nothing.
+    """
+    cursor = connection.cursor()
+    try:
+        cursor.execute(query)
+        connection.commit()
+    except sqlite3.Error as e:
+        print(f"The error '{e}' occurred")
+
+
+def save_game_to_db(connection, pgn: dict) -> None:
+    """Saves a Game to the Sqlite3 database
+    
+    Args: 
+        connection: A database connection object
+        pgn: A PGN dictionary representation
+    
+    Returns:
+        Nothing.
+    """
     execute_db_query(
-        conn,
+        connection,
         f"""INSERT INTO
         games (
             event,
@@ -112,7 +104,14 @@ def save_game_to_db(conn, pgn: dict) -> None:
 
 
 def fetch_chess_dotcom_games(user: str) -> list:
-    """TODO:"""
+    """Uses the chess.com API to fetch the requested users games.
+    
+    Args:
+        user: A chess.com username
+    
+    Returns:
+        list: A list of all games for that user.
+    """
     req = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
     archive_urls = req.json()["archives"]
     games_list = []
@@ -123,40 +122,89 @@ def fetch_chess_dotcom_games(user: str) -> list:
         for game in archived_games:
             games_list.append(game)
 
-    print(f"INFO:    Total games imported from chess.com = {len(games_list)}")
+    print(f"INFO:    Imported {len(games_list)} games from chess.com")
     return games_list
 
 
 def fetch_lichess_org_games(user: str) -> list:
-    """TODO:"""
+    """Uses the lichess API to fetch the requested users games.
+    
+    Args:
+        user: A lichess username
+    Returns:
+        list: A list of all games for that user.
+    """
     client = berserk.Client()
     req = client.games.export_by_player(user, as_pgn=True)
     games_list = list(req)
 
-    print(f"INFO:    Total games imported from lichess.org = {len(games_list)}")
+    print(f"INFO:    Imported {len(games_list)} games from lichess.org")
     return games_list
 
 
-def create_db_connection(path: str):
-    """TODO:"""
-    connection = None
-    try:
-        connection = sqlite3.connect(path)
-        print("INFO:    Connection to DB successful")
-    except sqlite3.Error as e:
-        print(f"Error:   The error '{e}' occurred")
+def build_pgn_dict(pgn: str) -> dict:
+    """Takes any pgn text file and coverts to a dictionary object
 
-    return connection
+    All pgn tags are converted to snake case. After converting, the dictionary
+    is checked against a tuple of expected keys, and if missing, adds them with
+    and empty string value. This ensures that each dictionary is uniform to
+    match the database table.
 
+    Args:
+        pgn: A PGN string
+    
+    Returns:
+        A Python Dictionary
+    """
+    game_dict = dict()
+    pgn_lines = pgn.split("\n")
 
-def execute_db_query(connection, query: str):
-    """TODO:"""
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-    except sqlite3.Error as e:
-        print(f"The error '{e}' occurred")
+    for line in pgn_lines:
+        if line.startswith("["):
+
+            key_pattern = re.compile(r"([^\s]+)")
+            value_pattern = re.compile(r"\"(.+?)\"")
+
+            key = convert_to_snake_case(
+                re.search(key_pattern, line).group().lstrip("[")
+            )
+
+            value = re.search(value_pattern, line)
+
+            if value is not None:
+                game_dict[key] = value.group().strip('"')
+            else:
+                game_dict[key] = ""
+
+        # The move notation is a single line in the pgn.
+        # The whole move notation is added to a single key:value
+        elif line.startswith("1."):
+            game_dict["moves"] = line
+
+    # If an expected key isn't present in the dictionary representation of the 
+    # pgn, then it is added with an empty string as its value.
+    expected_keys = (
+        "event",
+        "site",
+        "date",
+        "round",
+        "white",
+        "black",
+        "result",
+        "eco",
+        "white_elo",
+        "black_elo",
+        "variant",
+        "time_control",
+        "termination",
+        "moves",
+    )
+
+    for key in expected_keys:
+        if key not in game_dict:
+            game_dict[key] = ""
+
+    return game_dict
 
 
 @click.command()
@@ -205,6 +253,7 @@ def main(site, user, output):
         """,
     )
     print("INFO:    Created database and Games table")
+
 
     if site == "chess":
         print(f"INFO:    Fetching games for {user} from chess.com")
