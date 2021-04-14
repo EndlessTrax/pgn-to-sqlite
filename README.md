@@ -1,5 +1,8 @@
 # PGN to Sqlite
 
+![GitHub](https://img.shields.io/github/license/endlesstrax/pgn-to-sqlite)
+![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
+
 A cli application for pulling pgn files from Chess.com and Lichess.org and putting your games into a sqlite database.
 
 ## Install
