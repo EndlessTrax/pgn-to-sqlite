@@ -9,7 +9,7 @@ def test_snake_case_conversion():
 
 
 def test_build_png_dict_from_chess_dotcom():
-    with open("tests/test_pgn_file_chess_dotcom.pgn", "r") as f:
+    with open("tests/game_files/test_pgn_file_chess_dotcom.pgn", "r") as f:
         pgn_str = f.read()
         result = build_pgn_dict(pgn_str)
 
@@ -18,7 +18,7 @@ def test_build_png_dict_from_chess_dotcom():
 
 
 def test_build_png_dict_from_lichess():
-    with open("tests/test_pgn_file_lichess.pgn", "r") as f:
+    with open("tests/game_files/test_pgn_file_lichess.pgn", "r") as f:
         pgn_str = f.read()
         result = build_pgn_dict(pgn_str)
 
@@ -37,3 +37,4 @@ def test_ValueError_on_invalid_args():
         main, ["invalid_site", "-u", "endlesstrax", "-o", "games.db"]
     )
     assert result.exit_code == 1
+
