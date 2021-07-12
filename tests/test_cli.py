@@ -34,13 +34,12 @@ def test_chess_dotcom_api_endpoint():
 def test_ValueError_on_invalid_args():
     runner = CliRunner()
     result = runner.invoke(
-        cli, ["-u", "endlesstrax", "-o", "games.db", 'fetch', 'invaild']
+        cli, ["-u", "endlesstrax", "-o", "games.db", "fetch", "invaild"]
     )
     assert result.exit_code == 1
 
+
 def test_folder_input_file():
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["-o", "games.db", "save", "tests/game_files/"]
-    )
+    result = runner.invoke(cli, ["-o", "games.db", "save", "tests/game_files/"])
     assert result.exit_code == 0
