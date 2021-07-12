@@ -226,15 +226,11 @@ def build_pgn_dict(pgn: str) -> dict:
 @click.pass_context
 def cli(ctx, user, output):
     """
-    Which site do you want to download your games from? Or do you want to add
-    pgn files from a folder? You can download games from chess.com or lichess.org.\n
-    ARGS:    chess    OR    lichess    OR    folder
+    Save your chess games to an sqlite database.\n
+    You can `fetch` your games from chess.com or lichess.org. You can also 
+    `save` local pgn files to the database.\n
+    Type `pgn-to-sqlite --help` for more information.
     """
-
-    ctx.ensure_object(dict)
-
-    ctx.obj['USER'] = user
-    ctx.obj['OUTPUT'] = output
 
     db_conn = create_db_connection(output)
     execute_db_query(
@@ -259,18 +255,20 @@ def cli(ctx, user, output):
         """,
     )
 
-    ctx.obj["DB_CONN"] = db_conn
-
     print("INFO:    Created database and Games table")
+    
+    # Set the context to pass to commands.
+    ctx.ensure_object(dict)
+    ctx.obj['USER'] = user
+    ctx.obj['OUTPUT'] = output
+    ctx.obj["DB_CONN"] = db_conn
 
 
 @cli.command()
 @click.argument('site')
 @click.pass_context
 def fetch(ctx, site):
-    """
-    Fetch a list of games from the given site.
-    """
+    """Fetch all games from the requested site and save the to the database."""
 
     user = ctx.obj['USER']
     output = ctx.obj['OUTPUT']
@@ -301,9 +299,8 @@ def fetch(ctx, site):
 @click.argument('folder')
 @click.pass_context
 def save(ctx, folder):
-    """
-    Fetch a list of games from the given folder.
-    """
+    """ Fetch all pgn file from the given folder and save the games to the database."""
+    
     output = ctx.obj['OUTPUT']
     db_conn = ctx.obj["DB_CONN"]
 
