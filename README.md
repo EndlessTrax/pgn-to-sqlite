@@ -24,21 +24,47 @@ python -m pip install pgn_to_sqlite
 
 ## Usage
 
-The cli expects three arguments: `site`, `username`, and `output`.
+```shell
+Usage: pgn-to-sqlite [OPTIONS] COMMAND [ARGS]...
 
-`site`: can be with `chess` or `lichess`, for [chess.com](https://www.chess.com) and [lichess.org](https://lichess.org), respectively.
+  Save your chess games to an sqlite database.
 
-`-u username`: The username of the user you wish to download games of.
+  You can `fetch` your games from chess.com or lichess.org. You can also
+  `save` local pgn files to the database.
 
-`-o output`: should be a `path` to the `sqlite3` database.
+  Type `pgn-to-sqlite --help` for more information.
 
-### Example
+Options:
+  -u, --user TEXT    You username for the chess site.
+  -o, --output FILE  Where you would like your database saved?  [required]
+  --help             Show this message and exit.
 
-```powershell
-pgn-to-sqlite lichess -u myusername -o data.db
+Commands:
+  fetch  Fetch all games from the requested site.
+  save   Fetch all pgn file from the given folder.
+```
+
+### Fetch games from chess.com or lichess.org
+
+`username` and `output` are required when using `fetch` to download, parse, and save your games to your database. `fetch` accepts with `chess` or `lichess` as an argument for _[chess.com](https://www.chess.com)_ and _[lichess.org](https://lichess.org)_ respectively.
+
+Example:
+
+```shell
+pgn-to-sqlite -u endlesstrax -o data.db fetch lichess
 ```
 
 > If you've played a lot of games, **be patient**, it could take a minute or two.
+
+### Save games from local folder
+
+`output` is required when saving games from local pgn files to your database. `save` expects a folder path as an argument.
+
+Example:
+
+```shell
+pgn-to-sqlite -o data.db save .\chess\games\
+```
 
 ## Feedback and Contribution
 
@@ -57,3 +83,15 @@ Please **include tests** for any PR's that include code (unless current tests co
 If you would like to show your support for the project, I would be very grateful if you would donate to a charity close to my heart, [Walk AS One](https://walkasone.org/donate).
 
 And if you would prefer to donate to me personally instead, [you can sponsor me on Github](https://github.com/sponsors/EndlessTrax)? 🤓
+
+## Changelog
+
+### 2.0
+
+- Breaking changes to CLI commands
+- Added ability to add games from locally saved `.pgn` files to the output database
+
+### 1.0
+
+- Fetch games from _chess.com_ and _lichess.org_
+- Saves games to SQlite3 database

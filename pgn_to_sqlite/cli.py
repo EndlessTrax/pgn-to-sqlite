@@ -1,5 +1,6 @@
 import re
 import sqlite3
+from pathlib import Path
 
 import berserk
 import click
@@ -8,10 +9,10 @@ import requests
 
 def convert_to_snake_case(value: str) -> str:
     """Convert any camel case attribute name to snake case
-    
+
     Args:
         value: The key to be converted to snake case
-        
+
     Returns:
         The converted key
     """
@@ -20,10 +21,10 @@ def convert_to_snake_case(value: str) -> str:
 
 def create_db_connection(path: str):
     """Creates the main database connection object
-    
+
     Args:
         path: The path of the database (current or to be created)
-    
+
     Returns:
         connection: A database connection object
     """
@@ -39,12 +40,12 @@ def create_db_connection(path: str):
 
 def execute_db_query(connection, query: str) -> None:
     """Executes a SQL query on the Sqlite3 database
-    
+
     Args:
         connection: A database connection object
-        query: The SQL query as a string 
-    
-    Returns: 
+        query: The SQL query as a string
+
+    Returns:
         Nothing.
     """
     cursor = connection.cursor()
@@ -57,11 +58,11 @@ def execute_db_query(connection, query: str) -> None:
 
 def save_game_to_db(connection, pgn: dict) -> None:
     """Saves a Game to the Sqlite3 database
-    
-    Args: 
+
+    Args:
         connection: A database connection object
         pgn: A PGN dictionary representation
-    
+
     Returns:
         Nothing.
     """
@@ -106,10 +107,10 @@ def save_game_to_db(connection, pgn: dict) -> None:
 
 def fetch_chess_dotcom_games(user: str) -> list:
     """Uses the chess.com API to fetch the requested users games.
-    
+
     Args:
         user: A chess.com username
-    
+
     Returns:
         list: A list of all games for that user.
     """
@@ -129,7 +130,7 @@ def fetch_chess_dotcom_games(user: str) -> list:
 
 def fetch_lichess_org_games(user: str) -> list:
     """Uses the lichess API to fetch the requested users games.
-    
+
     Args:
         user: A lichess username
 
@@ -154,7 +155,7 @@ def build_pgn_dict(pgn: str) -> dict:
 
     Args:
         pgn: A PGN string
-    
+
     Returns:
         A Python Dictionary
     """
@@ -183,7 +184,7 @@ def build_pgn_dict(pgn: str) -> dict:
         elif line.startswith("1."):
             game_dict["moves"] = line
 
-    # If an expected key isn't present in the dictionary representation of the 
+    # If an expected key isn't present in the dictionary representation of the
     # pgn, then it is added with an empty string as its value.
     expected_keys = (
         "event",
@@ -209,27 +210,26 @@ def build_pgn_dict(pgn: str) -> dict:
     return game_dict
 
 
-@click.command()
-@click.argument("site")
+@click.group()
 @click.option(
     "-u",
     "--user",
-    prompt="Enter your username for the site...",
-    help="You username for the chess site",
+    help="You username for the chess site.",
 )
 @click.option(
     "-o",
     "--output",
     type=click.Path(file_okay=True, dir_okay=False, allow_dash=False),
     required=True,
-    prompt="Output path of the database...",
     help="Where you would like your database saved?",
 )
-def main(site, user, output):
+@click.pass_context
+def cli(ctx, user, output):
     """
-    Which SITE do you want to download your games from?
-    You can download games from chess.com or lichess.org.\n
-    ARGS:    chess    OR     lichess
+    Save your chess games to an sqlite database.\n
+    You can `fetch` your games from chess.com or lichess.org. You can also
+    `save` local pgn files to the database.\n
+    Type `pgn-to-sqlite --help` for more information.
     """
 
     db_conn = create_db_connection(output)
@@ -254,12 +254,28 @@ def main(site, user, output):
         );
         """,
     )
+
     print("INFO:    Created database and Games table")
 
+    # Set the context to pass to commands.
+    ctx.ensure_object(dict)
+    ctx.obj["USER"] = user
+    ctx.obj["OUTPUT"] = output
+    ctx.obj["DB_CONN"] = db_conn
+
+
+@cli.command()
+@click.argument("site")
+@click.pass_context
+def fetch(ctx, site):
+    """Fetch all games from the requested site."""
+
+    user = ctx.obj["USER"]
+    output = ctx.obj["OUTPUT"]
+    db_conn = ctx.obj["DB_CONN"]
 
     if site == "chess":
         print(f"INFO:    Fetching games for {user} from chess.com")
-
         games = fetch_chess_dotcom_games(user)
         for game in games:
             pgn_dict = build_pgn_dict(game["pgn"])
@@ -267,7 +283,6 @@ def main(site, user, output):
 
     elif site == "lichess":
         print(f"INFO:    Fetching games for {user} from lichess.org")
-
         games = fetch_lichess_org_games(user)
         for game in games:
             pgn_dict = build_pgn_dict(game)
@@ -275,11 +290,33 @@ def main(site, user, output):
 
     else:
         raise ValueError(
-            f"'{site}' is not a valid site name. Check --help for valid inputs"
+            f"'{site}' is not a valid argument. Check --help for valid inputs"
         )
 
     print(f"INFO:    Games saved to {output}")
 
 
+@cli.command()
+@click.argument("folder")
+@click.pass_context
+def save(ctx, folder):
+    """Fetch all pgn file from the given folder."""
+
+    output = ctx.obj["OUTPUT"]
+    db_conn = ctx.obj["DB_CONN"]
+
+    folder_path = Path(folder)
+
+    print(f"INFO:    Fetching games from folder: {folder_path}")
+
+    for pgn in folder_path.glob("*.pgn"):
+        with pgn.open() as f:
+            pgn_text = f.read()
+            pgn_dict = build_pgn_dict(pgn_text)
+            save_game_to_db(db_conn, pgn_dict)
+
+    print(f"INFO:    Games saved to {output}")
+
+
 if __name__ == "__main__":
-    main()
+    cli()
