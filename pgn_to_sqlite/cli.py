@@ -214,7 +214,7 @@ def build_pgn_dict(pgn: str) -> dict:
 @click.option(
     "-u",
     "--user",
-    help="You username for chess.com",
+    help="You username for the chess site.",
 )
 @click.option(
     "-o",
