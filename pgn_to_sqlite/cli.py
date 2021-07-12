@@ -1,3 +1,4 @@
+from pathlib import Path
 import re
 import sqlite3
 
@@ -209,28 +210,31 @@ def build_pgn_dict(pgn: str) -> dict:
     return game_dict
 
 
-@click.command()
-@click.argument("site")
+@click.group()
 @click.option(
     "-u",
     "--user",
-    prompt="Enter your username for the site...",
-    help="You username for the chess site",
+    help="You username for chess.com",
 )
 @click.option(
     "-o",
     "--output",
     type=click.Path(file_okay=True, dir_okay=False, allow_dash=False),
     required=True,
-    prompt="Output path of the database...",
     help="Where you would like your database saved?",
 )
-def main(site, user, output):
+@click.pass_context
+def cli(ctx, user, output):
     """
-    Which SITE do you want to download your games from?
-    You can download games from chess.com or lichess.org.\n
-    ARGS:    chess    OR     lichess
+    Which site do you want to download your games from? Or do you want to add
+    pgn files from a folder? You can download games from chess.com or lichess.org.\n
+    ARGS:    chess    OR    lichess    OR    folder
     """
+
+    ctx.ensure_object(dict)
+
+    ctx.obj['USER'] = user
+    ctx.obj['OUTPUT'] = output
 
     db_conn = create_db_connection(output)
     execute_db_query(
@@ -254,12 +258,26 @@ def main(site, user, output):
         );
         """,
     )
+
+    ctx.obj["DB_CONN"] = db_conn
+
     print("INFO:    Created database and Games table")
 
 
+@cli.command()
+@click.argument('site')
+@click.pass_context
+def fetch(ctx, site):
+    """
+    Fetch a list of games from the given site.
+    """
+
+    user = ctx.obj['USER']
+    output = ctx.obj['OUTPUT']
+    db_conn = ctx.obj["DB_CONN"]
+
     if site == "chess":
         print(f"INFO:    Fetching games for {user} from chess.com")
-
         games = fetch_chess_dotcom_games(user)
         for game in games:
             pgn_dict = build_pgn_dict(game["pgn"])
@@ -267,7 +285,6 @@ def main(site, user, output):
 
     elif site == "lichess":
         print(f"INFO:    Fetching games for {user} from lichess.org")
-
         games = fetch_lichess_org_games(user)
         for game in games:
             pgn_dict = build_pgn_dict(game)
@@ -275,11 +292,33 @@ def main(site, user, output):
 
     else:
         raise ValueError(
-            f"'{site}' is not a valid site name. Check --help for valid inputs"
+            f"'{site}' is not a valid argument. Check --help for valid inputs"
         )
+
+    print(f"INFO:    Games saved to {output}")
+
+@cli.command()
+@click.argument('folder')
+@click.pass_context
+def save(ctx, folder):
+    """
+    Fetch a list of games from the given folder.
+    """
+    output = ctx.obj['OUTPUT']
+    db_conn = ctx.obj["DB_CONN"]
+
+    folder_path = Path(folder)
+
+    print(f"INFO:    Fetching games from folder: {folder_path}")
+
+    for pgn in folder_path.glob("*.pgn"):
+        with pgn.open() as f:
+            pgn_text = f.read()
+            pgn_dict = build_pgn_dict(pgn_text)
+            save_game_to_db(db_conn, pgn_dict)
 
     print(f"INFO:    Games saved to {output}")
 
 
 if __name__ == "__main__":
-    main()
+    cli()
