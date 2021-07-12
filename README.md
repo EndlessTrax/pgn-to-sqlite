@@ -1,6 +1,6 @@
 # PGN to Sqlite
 
-[![PyPI version](https://badge.fury.io/py/pgn_to_sqlite.svg)](https://badge.fury.io/py/pgn_to_sqlite)
+![PyPI version](https://img.shields.io/pypi/v/pgn-to-sqlite)
 ![GitHub](https://img.shields.io/github/license/endlesstrax/pgn-to-sqlite)
 ![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
