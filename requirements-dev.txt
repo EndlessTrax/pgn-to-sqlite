@@ -21,7 +21,7 @@ pathspec==0.8.1
 pluggy==0.13.1
 py==1.10.0
 pyparsing==2.4.7
-pytest==6.2.3
+pytest==6.2.5
 pytest-cov==2.11.1
 regex==2021.7.6
 requests==2.25.1
