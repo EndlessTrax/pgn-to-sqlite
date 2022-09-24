@@ -8,7 +8,7 @@ A cli application for pulling pgn files from Chess.com and Lichess.org and putti
 
 ## Install
 
-> Requires Python 3.6 and above.
+> Requires Python 3.7 and above.
 
 MacOS / Linux:
 
