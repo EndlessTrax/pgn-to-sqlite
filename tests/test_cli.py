@@ -27,7 +27,7 @@ def test_build_png_dict_from_lichess():
 
 
 def test_chess_dotcom_api_endpoint():
-    r = requests.get(f"https://api.chess.com/pub/player/endlesstrax/games/archives")
+    r = requests.get("https://api.chess.com/pub/player/endlesstrax/games/archives")
     assert r.status_code == 200
 
 
