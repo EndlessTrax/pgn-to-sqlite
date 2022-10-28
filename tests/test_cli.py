@@ -1,6 +1,7 @@
 import requests
 from click.testing import CliRunner
-from pgn_to_sqlite.cli import build_pgn_dict, convert_to_snake_case, cli
+
+from pgn_to_sqlite.cli import build_pgn_dict, cli, convert_to_snake_case
 
 
 def test_snake_case_conversion():
