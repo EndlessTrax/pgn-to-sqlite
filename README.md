@@ -74,7 +74,7 @@ If you have feature requests, please [file an issue](https://github.com/EndlessT
 
 Please **raise an issue before making a PR**, so that the issue and implementation can be discussed before you write any code. This will save you time, and increase the chances of your PR being merged without significant changes.
 
-Please **format you code** with [Black](https://pypi.org/project/black/).
+Please **format you code** with [Black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/).
 
 Please **include tests** for any PR's that include code (unless current tests cover your code contribution).
 
@@ -83,15 +83,3 @@ Please **include tests** for any PR's that include code (unless current tests co
 If you would like to show your support for the project, I would be very grateful if you would donate to a charity close to my heart, [Walk AS One](https://walkasone.org/donate).
 
 And if you would prefer to donate to me personally instead, [you can sponsor me on Github](https://github.com/sponsors/EndlessTrax)? 🤓
-
-## Changelog
-
-### 2.0
-
-- Breaking changes to CLI commands
-- Added ability to add games from locally saved `.pgn` files to the output database
-
-### 1.0
-
-- Fetch games from _chess.com_ and _lichess.org_
-- Saves games to SQlite3 database
