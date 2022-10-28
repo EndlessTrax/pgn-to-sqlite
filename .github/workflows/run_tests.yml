@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: 
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
         
     steps:
     - uses: actions/checkout@v3
@@ -16,9 +16,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip' # caching pip dependencies
-    - run: |
+      
+    - name: Install Tox
+      run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Run pytest
-      run: pytest
+        pip install tox
+        
+    - name: Run Tox
+      # Run tox using the version of Python in `PATH`
+      run: tox -e py
