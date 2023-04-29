@@ -38,7 +38,7 @@ def create_db_connection(path: str):
     return connection
 
 
-def execute_db_query(connection, query: str) -> None:
+def execute_db_query(connection, query: str, values: tuple = None) -> None:
     """Executes a SQL query on the Sqlite3 database
 
     Args:
@@ -50,7 +50,10 @@ def execute_db_query(connection, query: str) -> None:
     """
     cursor = connection.cursor()
     try:
-        cursor.execute(query)
+        if values:
+            cursor.execute(query, values)
+        else:
+            cursor.execute(query)
         connection.commit()
     except sqlite3.Error as e:
         print(f"The error '{e}' occurred")
@@ -66,42 +69,29 @@ def save_game_to_db(connection, pgn: dict) -> None:
     Returns:
         Nothing.
     """
+
     execute_db_query(
         connection,
-        f"""INSERT INTO
-        games (
-            event,
-            site,
-            date,
-            round,
-            white,
-            black,
-            result,
-            eco,
-            white_elo,
-            black_elo,
-            variant,
-            time_control,
-            termination,
-            moves)
-        VALUES
+        """INSERT INTO
+        games(event, site, date, round, white, black, result, eco, white_elo,
+        black_elo, variant, time_control, termination, moves) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);""",
         (
-            '{pgn["event"]}',
-            '{pgn["site"]}',
-            '{pgn["date"]}',
-            '{pgn["round"]}',
-            '{pgn["white"]}',
-            '{pgn["black"]}',
-            '{pgn["result"]}',
-            '{pgn["eco"]}',
-            '{pgn["white_elo"]}',
-            '{pgn["black_elo"]}',
-            '{pgn["variant"]}',
-            '{pgn["time_control"]}',
-            '{pgn["termination"]}',
-            '{pgn["moves"]}'
-        );
-        """,
+            pgn["event"],
+            pgn["site"],
+            pgn["date"],
+            pgn["round"],
+            pgn["white"],
+            pgn["black"],
+            pgn["result"],
+            pgn["eco"],
+            pgn["white_elo"],
+            pgn["black_elo"],
+            pgn["variant"],
+            pgn["time_control"],
+            pgn["termination"],
+            pgn["moves"],
+        ),
     )
 
 
