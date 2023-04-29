@@ -44,6 +44,7 @@ def execute_db_query(connection, query: str, values: tuple = None) -> None:
     Args:
         connection: A database connection object
         query: The SQL query as a string
+        values: A tuple of values to be inserted into the query
 
     Returns:
         Nothing.
