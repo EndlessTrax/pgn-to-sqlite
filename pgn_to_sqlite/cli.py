@@ -105,7 +105,13 @@ def fetch_chess_dotcom_games(user: str) -> list:
     Returns:
         list: A list of all games for that user.
     """
-    req = requests.get(f"https://api.chess.com/pub/player/{user}/games/archives")
+    # The chess.com API requires a user agent header to be set with an email address.
+    # See here for the details:
+    # https://www.chess.com/announcements/view/breaking-change-user-agent-contact-info-required
+    req = requests.get(
+        f"https://api.chess.com/pub/player/{user}/games/archives",
+        headers={"User-Agent": "test@gmail.com"},
+    )
     archive_urls = req.json()["archives"]
     games_list = []
 
@@ -155,7 +161,6 @@ def build_pgn_dict(pgn: str) -> dict:
 
     for line in pgn_lines:
         if line.startswith("["):
-
             key_pattern = re.compile(r"([^\s]+)")
             value_pattern = re.compile(r"\"(.+?)\"")
 
