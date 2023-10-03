@@ -1,30 +1,33 @@
 [build-system]
-requires = ["flit_core >=2,<4"]
+requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "pgn_to_sqlite"
-author = "Ricky White"
-author-email = "ricky@whitelionmedia.com"
-home-page = "https://github.com/EndlessTrax/pgn-to-sqlite"
+[project]
+name = "pgn_to_sqlite"
+authors = [{name = "Ricky White", email = "ricky@rickywhite.net"}]
+readme = "README.md"
+license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
-] 
-description-file = "README.md"
-requires = [
+    "Programming Language :: Python :: 3.12",
+]
+dynamic = ["description"]
+dependencies  = [
+    "berserk==0.12.8",
     "click==8.1.7",
-    "requests==2.31.0",
-    "berserk==0.12.8"
+    "requests==2.31.0"
 ]
 requires-python=">=3.8"
+version="2.1.0"
 
-[tool.flit.metadata.urls]
+[project.urls]
+Home = "https://github.com/EndlessTrax/pgn-to-sqlite"
 Documentation = "https://github.com/EndlessTrax/pgn-to-sqlite/blob/master/README.md"
 Issues = "https://github.com/EndlessTrax/pgn-to-sqlite/issues"
 
-[tool.flit.scripts]
+[project.scripts]
 pgn-to-sqlite = "pgn_to_sqlite.cli:cli"
