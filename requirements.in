@@ -1,11 +1,13 @@
+# Build
 berserk
 click
 requests
+
+# Dev
 black
+isort
 flit
 pytest
 pytest-cov
 ruff
-isort
-tox
 typing_extensions==3.10.0.0 # Required for Black to run on Python < 3.10
