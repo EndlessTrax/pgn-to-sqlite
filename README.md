@@ -6,9 +6,19 @@
 
 A cli application for pulling pgn files from Chess.com and Lichess.org and putting your games into a sqlite database.
 
+It can also be used to save pgn files from a local folder to a sqlite database.
+
 ## Install
 
-> Requires Python 3.7 and above.
+> Requires Python 3.8 and above.
+
+It is recommended that you install this package in a virtual or isoloated environment. The easiest way to do this is with [pipx](https://github.com/pypa/pipx).
+
+```shell
+pipx install pgn_to_sqlite
+```
+
+Alternatively, you can install it with pip into your virtual environment:
 
 MacOS / Linux:
 
@@ -74,12 +84,10 @@ If you have feature requests, please [file an issue](https://github.com/EndlessT
 
 Please **raise an issue before making a PR**, so that the issue and implementation can be discussed before you write any code. This will save you time, and increase the chances of your PR being merged without significant changes.
 
-Please **format you code** with [Black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/).
+Please **format you code** with [Black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/). I also reccomend using [ruff](https://github.com/astral-sh/ruff) to lint your code.
 
 Please **include tests** for any PR's that include code (unless current tests cover your code contribution).
 
 ## Support
 
-If you would like to show your support for the project, I would be very grateful if you would donate to a charity close to my heart, [Walk AS One](https://walkasone.org/donate).
-
-And if you would prefer to donate to me personally instead, [you can sponsor me on Github](https://github.com/sponsors/EndlessTrax)? 🤓
+If you would like to show your support for the project you can [sponsor me on Github](https://github.com/sponsors/EndlessTrax), or [buy me a coffee](https://ko-fi.com/endlesstrax). 🤓
