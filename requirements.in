@@ -11,4 +11,4 @@ pytest
 pytest-cov
 ruff
 exceptiongroup # Required for pytest to run on Python < 3.10
-typing_extensions==3.10.0.0 # Required for Black to run on Python < 3.10
+typing_extensions==4.9.0 # Required for Black to run on Python < 3.10
