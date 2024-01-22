@@ -17,7 +17,7 @@ classifiers = [
 ]
 dynamic = ["description"]
 dependencies  = [
-    "berserk==0.12.8",
+    "berserk==0.13.2",
     "click==8.1.7",
     "requests==2.31.0"
 ]
