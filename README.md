@@ -84,7 +84,7 @@ If you have feature requests, please [file an issue](https://github.com/EndlessT
 
 Please **raise an issue before making a PR**, so that the issue and implementation can be discussed before you write any code. This will save you time, and increase the chances of your PR being merged without significant changes.
 
-Please **format you code** with [Black](https://pypi.org/project/black/) and [isort](https://pypi.org/project/isort/). I also reccomend using [ruff](https://github.com/astral-sh/ruff) to lint your code.
+Please **lint and format you code** with [ruff](https://github.com/astral-sh/ruff). Use `ruff check .` and `ruff format .` to check and format your code respectively. This will help keep the codebase consistent and maintainable.
 
 Please **include tests** for any PR's that include code (unless current tests cover your code contribution).
 
