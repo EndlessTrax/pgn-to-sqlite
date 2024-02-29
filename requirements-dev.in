@@ -1,0 +1,11 @@
+# Build
+berserk==0.13.2
+click==8.1.7
+requests==2.31.0
+
+# Dev
+flit==3.9.0
+pytest==8.0.2
+pytest-cov==4.1.0
+ruff==0.3.0
+exceptiongroup==1.2.0 # Required for pytest to run on Python < 3.10
