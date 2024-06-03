@@ -19,7 +19,7 @@ dynamic = ["description"]
 dependencies  = [
     "berserk==0.13.2",
     "click==8.1.7",
-    "requests==2.32.2"
+    "requests==2.32.3"
 ]
 requires-python=">=3.8"
 version="2.1.10"
