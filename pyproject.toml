@@ -22,7 +22,7 @@ dependencies  = [
     "requests==2.32.3"
 ]
 requires-python=">=3.8"
-version="2.1.11"
+version="2.1.12"
 
 [project.urls]
 Home = "https://github.com/EndlessTrax/pgn-to-sqlite"
