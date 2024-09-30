@@ -7,5 +7,5 @@ requests==2.32.3
 flit==3.9.0
 pytest==8.3.3
 pytest-cov==5.0.0
-ruff==0.6.7
+ruff==0.6.8
 exceptiongroup==1.2.2 # Required for pytest to run on Python < 3.10
