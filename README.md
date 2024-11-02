@@ -2,7 +2,6 @@
 
 ![PyPI version](https://img.shields.io/pypi/v/pgn-to-sqlite)
 ![GitHub](https://img.shields.io/github/license/endlesstrax/pgn-to-sqlite)
-![Black](https://img.shields.io/badge/code%20style-black-000000.svg)
 
 A cli application for pulling pgn files from Chess.com and Lichess.org and putting your games into a sqlite database.
 
@@ -10,7 +9,7 @@ It can also be used to save pgn files from a local folder to a sqlite database.
 
 ## Install
 
-> Requires Python 3.8 and above.
+> Requires Python 3.9 and above.
 
 It is recommended that you install this package in a virtual or isoloated environment. The easiest way to do this is with [pipx](https://github.com/pypa/pipx).
 
