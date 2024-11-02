@@ -10,7 +10,7 @@ It can also be used to save pgn files from a local folder to a sqlite database.
 
 ## Install
 
-> Requires Python 3.8 and above.
+> Requires Python 9 and above.
 
 It is recommended that you install this package in a virtual or isoloated environment. The easiest way to do this is with [pipx](https://github.com/pypa/pipx).
 
