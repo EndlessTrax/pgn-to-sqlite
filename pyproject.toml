@@ -1,10 +1,13 @@
 [build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "pgn_to_sqlite"
+version="2.1.14"
+requires-python = ">=3.8"
 authors = [{name = "Ricky White", email = "ricky@rickywhite.net"}]
+description = "Pull your Chess games from chess.com and lichess.org into a sqlite3 database."
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = [
@@ -15,14 +18,11 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dynamic = ["description"]
-dependencies  = [
+dependencies = [
     "berserk==0.13.2",
     "click==8.1.7",
     "requests==2.32.3"
 ]
-requires-python=">=3.8"
-version="2.1.14"
 
 [project.urls]
 Home = "https://github.com/EndlessTrax/pgn-to-sqlite"
