@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pgn_to_sqlite"
-version="2.1.14"
+version="2.2.0"
 requires-python = ">=3.9"
 authors = [{name = "Ricky White", email = "ricky@rickywhite.net"}]
 description = "Pull your Chess games from chess.com and lichess.org into a sqlite3 database."
