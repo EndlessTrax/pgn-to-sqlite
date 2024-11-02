@@ -31,3 +31,12 @@ Issues = "https://github.com/EndlessTrax/pgn-to-sqlite/issues"
 
 [project.scripts]
 pgn-to-sqlite = "pgn_to_sqlite.cli:cli"
+
+[tool.uv]
+dev-dependencies = [
+    "exceptiongroup>=1.2.2",
+    "flit>=3.10.0",
+    "pytest>=8.3.3",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.7.2",
+]
