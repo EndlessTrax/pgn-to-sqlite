@@ -1,34 +1,35 @@
-# PGN to Sqlite
+# PGN to SQLite
 
 ![PyPI version](https://img.shields.io/pypi/v/pgn-to-sqlite)
 ![GitHub](https://img.shields.io/github/license/endlesstrax/pgn-to-sqlite)
+![Python Version](https://img.shields.io/pypi/pyversions/pgn-to-sqlite)
 
-A cli application for pulling pgn files from Chess.com and Lichess.org and putting your games into a sqlite database.
+A CLI application for pulling PGN files from Chess.com and Lichess.org and saving your games into a SQLite database.
 
-It can also be used to save pgn files from a local folder to a sqlite database.
+It can also be used to save PGN files from a local folder to a SQLite database.
 
-## Install
+## Requirements
 
-> Requires Python 3.9 and above.
+Python 3.10 or higher is required.
 
-It is recommended that you install this package in a virtual or isoloated environment. The easiest way to do this is with [pipx](https://github.com/pypa/pipx).
+## Installation
+
+It is recommended that you install this package in a virtual or isolated environment. The easiest way to do this is with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv tool install pgn_to_sqlite
+```
+
+Alternatively, you can install it with [pipx](https://github.com/pypa/pipx):
 
 ```shell
 pipx install pgn_to_sqlite
 ```
 
-Alternatively, you can install it with pip into your virtual environment:
-
-MacOS / Linux:
+Or with `pip`:
 
 ```bash
-python3 -m pip install pgn_to_sqlite
-```
-
-Windows:
-
-```powershell
-python -m pip install pgn_to_sqlite
+pip install pgn_to_sqlite
 ```
 
 ## Usage
@@ -36,57 +37,117 @@ python -m pip install pgn_to_sqlite
 ```shell
 Usage: pgn-to-sqlite [OPTIONS] COMMAND [ARGS]...
 
-  Save your chess games to an sqlite database.
+  Save your chess games to a SQLite database.
 
   You can `fetch` your games from chess.com or lichess.org. You can also
-  `save` local pgn files to the database.
-
-  Type `pgn-to-sqlite --help` for more information.
+  `save` local PGN files to the database.
 
 Options:
-  -u, --user TEXT    You username for the chess site.
-  -o, --output FILE  Where you would like your database saved?  [required]
+  -u, --user TEXT    Your username for the chess site.
+  -o, --output FILE  Where you would like your database saved.  [required]
   --help             Show this message and exit.
 
 Commands:
   fetch  Fetch all games from the requested site.
-  save   Fetch all pgn file from the given folder.
+  save   Save all PGN files from the given folder.
 ```
 
-### Fetch games from chess.com or lichess.org
+### Fetching Games from Chess.com or Lichess.org
 
-`username` and `output` are required when using `fetch` to download, parse, and save your games to your database. `fetch` accepts with `chess` or `lichess` as an argument for _[chess.com](https://www.chess.com)_ and _[lichess.org](https://lichess.org)_ respectively.
+To download, parse, and save your games, both `--user` and `--output` are required. The `fetch` command accepts either `chess` or `lichess` as an argument for [Chess.com](https://www.chess.com) and [Lichess.org](https://lichess.org) respectively.
 
-Example:
+**Example:**
 
 ```shell
-pgn-to-sqlite -u endlesstrax -o data.db fetch lichess
+pgn-to-sqlite -u endlesstrax -o games.db fetch lichess
 ```
 
-> If you've played a lot of games, **be patient**, it could take a minute or two.
+> **Note:** If you've played a lot of games, be patient—it could take a minute or two to download and process them all.
 
-### Save games from local folder
+### Saving Games from a Local Folder
 
-`output` is required when saving games from local pgn files to your database. `save` expects a folder path as an argument.
+To save games from local PGN files to your database, only `--output` is required. The `save` command expects a folder path as an argument.
 
-Example:
+**Example:**
 
 ```shell
-pgn-to-sqlite -o data.db save .\chess\games\
+pgn-to-sqlite -o games.db save ./chess/games/
 ```
 
-## Feedback and Contribution
+## Development
 
-If you find a bug, please file an [issue](https://github.com/EndlessTrax/pgn-to-sqlite/issues).
+This project uses [uv](https://docs.astral.sh/uv/) for dependency management and development workflows.
 
-If you have feature requests, please [file an issue](https://github.com/EndlessTrax/pgn-to-sqlite/issues) and use the appropriate label.
+### Setting Up Your Development Environment
 
-Please **raise an issue before making a PR**, so that the issue and implementation can be discussed before you write any code. This will save you time, and increase the chances of your PR being merged without significant changes.
+1. Install `uv` if you haven't already:
+   ```bash
+   pip install uv
+   ```
 
-Please **lint and format you code** with [ruff](https://github.com/astral-sh/ruff). Use `ruff check .` and `ruff format .` to check and format your code respectively. This will help keep the codebase consistent and maintainable.
+2. Clone the repository:
+   ```bash
+   git clone https://github.com/EndlessTrax/pgn-to-sqlite.git
+   cd pgn-to-sqlite
+   ```
 
-Please **include tests** for any PR's that include code (unless current tests cover your code contribution).
+3. Sync dependencies and set up the virtual environment:
+   ```bash
+   uv sync
+   ```
+
+### Running Tests
+
+Run the test suite with:
+
+```bash
+uv run pytest
+```
+
+For coverage reporting:
+
+```bash
+uv run pytest --cov
+```
+
+### Linting and Formatting
+
+This project uses [Ruff](https://github.com/astral-sh/ruff) for linting and formatting:
+
+```bash
+# Check for issues
+uv run ruff check .
+
+# Format code
+uv run ruff format .
+```
+
+### Building the Project
+
+To build the package:
+
+```bash
+uv build
+```
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. **File an issue first** - Before making a PR, please [file an issue](https://github.com/EndlessTrax/pgn-to-sqlite/issues) so the implementation can be discussed. This saves time and increases the chances of your PR being merged without significant changes.
+
+2. **Lint and format your code** - Use `uv run ruff check .` and `uv run ruff format .` to ensure your code follows the project's style guidelines.
+
+3. **Include tests** - Please include tests for any code changes (unless current tests already cover your contribution).
+
+4. **Update documentation** - If your changes affect usage, please update the README accordingly.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-If you would like to show your support for the project you can [sponsor me on Github](https://github.com/sponsors/EndlessTrax), or [buy me a coffee](https://ko-fi.com/endlesstrax). 🤓
+If you find this project useful and would like to show your support, you can:
+- [Sponsor on GitHub](https://github.com/sponsors/EndlessTrax)
+- [Buy me a coffee](https://ko-fi.com/endlesstrax) ☕
