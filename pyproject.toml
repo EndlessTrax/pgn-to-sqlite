@@ -1,42 +1,44 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.9.6,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "pgn_to_sqlite"
+module-root = ""
 
 [project]
 name = "pgn_to_sqlite"
-version="2.2.1"
-requires-python = ">=3.9"
+version="2.3.0"
+requires-python = ">=3.10"
 authors = [{name = "Ricky White", email = "ricky@rickywhite.net"}]
 description = "Pull your Chess games from chess.com and lichess.org into a sqlite3 database."
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = [
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "berserk==0.14.0",
-    "click==8.1.8",
-    "requests==2.32.5"
+    "berserk>=0.14.0",
+    "click>=8.3.0",
+    "requests>=2.32.5",
 ]
+
+[project.scripts]
+pgn-to-sqlite = "pgn_to_sqlite.cli:cli"
 
 [project.urls]
 Home = "https://github.com/EndlessTrax/pgn-to-sqlite"
 Documentation = "https://github.com/EndlessTrax/pgn-to-sqlite/blob/master/README.md"
 Issues = "https://github.com/EndlessTrax/pgn-to-sqlite/issues"
 
-[project.scripts]
-pgn-to-sqlite = "pgn_to_sqlite.cli:cli"
-
-[tool.uv]
-dev-dependencies = [
-    "exceptiongroup>=1.2.2",
-    "flit>=3.10.0",
-    "pytest>=8.3.3",
-    "pytest-cov>=5.0.0",
-    "ruff>=0.7.2",
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff"
 ]
