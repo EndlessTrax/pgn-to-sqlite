@@ -22,7 +22,7 @@ jobs:
         run: uv python install 3.13
 
       - name: Install the dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --all-extras
 
       # Update output format to enable automatic inline annotations.
       - name: Run Ruff
