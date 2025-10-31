@@ -14,22 +14,22 @@ Python 3.10 or higher is required.
 
 ## Installation
 
-It is recommended that you install this package in a virtual or isolated environment. The easiest way to do this is with [pipx](https://github.com/pypa/pipx):
+It is recommended that you install this package in a virtual or isolated environment. The easiest way to do this is with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv tool install pgn_to_sqlite
+```
+
+Alternatively, you can install it with [pipx](https://github.com/pypa/pipx):
 
 ```shell
 pipx install pgn_to_sqlite
 ```
 
-Alternatively, you can install it with `pip`:
+Or with `pip`:
 
 ```bash
 pip install pgn_to_sqlite
-```
-
-Or with [uv](https://docs.astral.sh/uv/):
-
-```bash
-uv tool install pgn_to_sqlite
 ```
 
 ## Usage
