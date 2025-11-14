@@ -5,6 +5,14 @@ from pathlib import Path
 import berserk
 import click
 import requests
+from rich.progress import (
+    BarColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+    TimeRemainingColumn,
+)
 
 
 def convert_to_snake_case(value: str) -> str:
@@ -115,11 +123,22 @@ def fetch_chess_dotcom_games(user: str) -> list:
     archive_urls = req.json()["archives"]
     games_list = []
 
-    for url in archive_urls:
-        archived_games = requests.get(url).json()["games"]
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeRemainingColumn(),
+    ) as progress:
+        task = progress.add_task(f"Fetching games from chess.com...", total=len(archive_urls))
+        
+        for url in archive_urls:
+            archived_games = requests.get(url).json()["games"]
 
-        for game in archived_games:
-            games_list.append(game)
+            for game in archived_games:
+                games_list.append(game)
+            
+            progress.update(task, advance=1)
 
     print(f"INFO:    Imported {len(games_list)} games from chess.com")
     return games_list
@@ -136,7 +155,17 @@ def fetch_lichess_org_games(user: str) -> list:
     """
     client = berserk.Client()
     req = client.games.export_by_player(user, as_pgn=True)
-    games_list = list(req)
+    games_list = []
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+    ) as progress:
+        task = progress.add_task("Fetching games from lichess.org...", total=None)
+        
+        for game in req:
+            games_list.append(game)
+            progress.update(task, advance=1)
 
     print(f"INFO:    Imported {len(games_list)} games from lichess.org")
     return games_list
@@ -273,16 +302,38 @@ def fetch(ctx, site):
     if site == "chess":
         print(f"INFO:    Fetching games for {user} from chess.com")
         games = fetch_chess_dotcom_games(user)
-        for game in games:
-            pgn_dict = build_pgn_dict(game["pgn"])
-            save_game_to_db(db_conn, pgn_dict)
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+        ) as progress:
+            task = progress.add_task("Saving games to database...", total=len(games))
+            
+            for game in games:
+                pgn_dict = build_pgn_dict(game["pgn"])
+                save_game_to_db(db_conn, pgn_dict)
+                progress.update(task, advance=1)
 
     elif site == "lichess":
         print(f"INFO:    Fetching games for {user} from lichess.org")
         games = fetch_lichess_org_games(user)
-        for game in games:
-            pgn_dict = build_pgn_dict(game)
-            save_game_to_db(db_conn, pgn_dict)
+        
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+        ) as progress:
+            task = progress.add_task("Saving games to database...", total=len(games))
+            
+            for game in games:
+                pgn_dict = build_pgn_dict(game)
+                save_game_to_db(db_conn, pgn_dict)
+                progress.update(task, advance=1)
 
     else:
         raise ValueError(
@@ -305,11 +356,23 @@ def save(ctx, folder):
 
     print(f"INFO:    Fetching games from folder: {folder_path}")
 
-    for pgn in folder_path.glob("*.pgn"):
-        with pgn.open() as f:
-            pgn_text = f.read()
-            pgn_dict = build_pgn_dict(pgn_text)
-            save_game_to_db(db_conn, pgn_dict)
+    pgn_files = list(folder_path.glob("*.pgn"))
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeRemainingColumn(),
+    ) as progress:
+        task = progress.add_task("Processing PGN files...", total=len(pgn_files))
+        
+        for pgn in pgn_files:
+            with pgn.open() as f:
+                pgn_text = f.read()
+                pgn_dict = build_pgn_dict(pgn_text)
+                save_game_to_db(db_conn, pgn_dict)
+            progress.update(task, advance=1)
 
     print(f"INFO:    Games saved to {output}")
 
