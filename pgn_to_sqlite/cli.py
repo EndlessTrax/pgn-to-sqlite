@@ -108,18 +108,53 @@ def fetch_chess_dotcom_games(user: str) -> list:
     # The chess.com API requires a user agent header to be set with an email address.
     # See here for the details:
     # https://www.chess.com/announcements/view/breaking-change-user-agent-contact-info-required
-    req = requests.get(
-        f"https://api.chess.com/pub/player/{user}/games/archives",
-        headers={"User-Agent": "test@gmail.com"},
-    )
-    archive_urls = req.json()["archives"]
+    try:
+        req = requests.get(
+            f"https://api.chess.com/pub/player/{user}/games/archives",
+            headers={"User-Agent": "test@gmail.com"},
+            timeout=30,
+        )
+        req.raise_for_status()
+    except requests.exceptions.ConnectionError:
+        print("ERROR:   Unable to connect to chess.com. Please check your internet connection.")
+        raise click.Abort()
+    except requests.exceptions.Timeout:
+        print("ERROR:   Request to chess.com timed out. Please try again later.")
+        raise click.Abort()
+    except requests.exceptions.HTTPError as e:
+        if req.status_code == 404:
+            print(f"ERROR:   User '{user}' not found on chess.com. Please check the username.")
+        elif req.status_code == 429:
+            print("ERROR:   Rate limit exceeded. Please wait a few minutes and try again.")
+        else:
+            print(f"ERROR:   HTTP error occurred: {e}")
+        raise click.Abort()
+    except requests.exceptions.RequestException as e:
+        print(f"ERROR:   An error occurred while fetching data from chess.com: {e}")
+        raise click.Abort()
+    
+    try:
+        archive_urls = req.json()["archives"]
+    except (ValueError, KeyError) as e:
+        print("ERROR:   Received invalid data from chess.com API.")
+        raise click.Abort()
+    
     games_list = []
 
     for url in archive_urls:
-        archived_games = requests.get(url).json()["games"]
-
-        for game in archived_games:
-            games_list.append(game)
+        try:
+            archived_games_req = requests.get(url, timeout=30)
+            archived_games_req.raise_for_status()
+            archived_games = archived_games_req.json()["games"]
+            
+            for game in archived_games:
+                games_list.append(game)
+        except requests.exceptions.RequestException as e:
+            print(f"WARNING: Failed to fetch games from {url}: {e}")
+            continue
+        except (ValueError, KeyError):
+            print(f"WARNING: Received invalid data from {url}")
+            continue
 
     print(f"INFO:    Imported {len(games_list)} games from chess.com")
     return games_list
@@ -135,8 +170,32 @@ def fetch_lichess_org_games(user: str) -> list:
         list: A list of all games for that user.
     """
     client = berserk.Client()
-    req = client.games.export_by_player(user, as_pgn=True)
-    games_list = list(req)
+    try:
+        req = client.games.export_by_player(user, as_pgn=True)
+        games_list = list(req)
+    except requests.exceptions.ConnectionError:
+        print("ERROR:   Unable to connect to lichess.org. Please check your internet connection.")
+        raise click.Abort()
+    except requests.exceptions.Timeout:
+        print("ERROR:   Request to lichess.org timed out. Please try again later.")
+        raise click.Abort()
+    except requests.exceptions.HTTPError as e:
+        if hasattr(e, 'response') and e.response is not None:
+            if e.response.status_code == 404:
+                print(f"ERROR:   User '{user}' not found on lichess.org. Please check the username.")
+            elif e.response.status_code == 429:
+                print("ERROR:   Rate limit exceeded. Please wait a few minutes and try again.")
+            else:
+                print(f"ERROR:   HTTP error occurred: {e}")
+        else:
+            print(f"ERROR:   HTTP error occurred: {e}")
+        raise click.Abort()
+    except requests.exceptions.RequestException as e:
+        print(f"ERROR:   An error occurred while fetching data from lichess.org: {e}")
+        raise click.Abort()
+    except Exception as e:
+        print(f"ERROR:   An unexpected error occurred: {e}")
+        raise click.Abort()
 
     print(f"INFO:    Imported {len(games_list)} games from lichess.org")
     return games_list
