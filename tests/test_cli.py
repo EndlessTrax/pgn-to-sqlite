@@ -1,3 +1,9 @@
+import os
+import sqlite3
+import tempfile
+from pathlib import Path
+
+import pytest
 import requests
 from click.testing import CliRunner
 
@@ -54,3 +60,23 @@ def test_folder_input_file():
     runner = CliRunner()
     result = runner.invoke(cli, ["-o", "games.db", "save", "tests/game_files/"])
     assert result.exit_code == 0
+
+
+def test_save_command_creates_database_with_games():
+    """Test that save command with progress indicators saves all games correctly"""
+    runner = CliRunner()
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        db_path = os.path.join(tmpdir, "test_games.db")
+        result = runner.invoke(cli, ["-o", db_path, "save", "tests/game_files/"])
+        assert result.exit_code == 0
+
+        # Verify the database was created and games were saved
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM games")
+        count = cursor.fetchone()[0]
+        conn.close()
+
+        # We have 2 PGN files in the test directory
+        assert count == 2
