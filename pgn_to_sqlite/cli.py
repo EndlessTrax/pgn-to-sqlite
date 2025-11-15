@@ -6,6 +6,14 @@ from typing import Optional
 import berserk
 import click
 import requests
+from rich.progress import (
+    BarColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+    TimeRemainingColumn,
+)
 
 
 def convert_to_snake_case(value: str) -> str:
@@ -37,6 +45,7 @@ def create_db_connection(path: str):
         print(f"ERROR:   The error '{e}' occurred")
 
     return connection
+
 
 def execute_db_query(connection, query: str, values: Optional[tuple] = None) -> None:
     """Executes a SQL query on the Sqlite3 database
@@ -147,20 +156,33 @@ def fetch_chess_dotcom_games(user: str) -> list:
 
     games_list = []
 
-    for url in archive_urls:
-        try:
-            archived_games_req = requests.get(url, timeout=30)
-            archived_games_req.raise_for_status()
-            archived_games = archived_games_req.json()["games"]
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeRemainingColumn(),
+    ) as progress:
+        task = progress.add_task(
+            f"Fetching games from chess.com...", total=len(archive_urls)
+        )
 
-            for game in archived_games:
-                games_list.append(game)
-        except requests.exceptions.RequestException as e:
-            print(f"WARNING: Failed to fetch games from {url}: {e}")
-            continue
-        except (ValueError, KeyError):
-            print(f"WARNING: Received invalid data from {url}")
-            continue
+        for url in archive_urls:
+            try:
+                archived_games_req = requests.get(url, timeout=30)
+                archived_games_req.raise_for_status()
+                archived_games = archived_games_req.json()["games"]
+
+                for game in archived_games:
+                    games_list.append(game)
+            except requests.exceptions.RequestException as e:
+                print(f"WARNING: Failed to fetch games from {url}: {e}")
+                continue
+            except (ValueError, KeyError):
+                print(f"WARNING: Received invalid data from {url}")
+                continue
+
+            progress.update(task, advance=1)
 
     print(f"INFO:    Imported {len(games_list)} games from chess.com")
     return games_list
@@ -176,9 +198,21 @@ def fetch_lichess_org_games(user: str) -> list:
         list: A list of all games for that user.
     """
     client = berserk.Client()
+
+    games_list = []
+
     try:
         req = client.games.export_by_player(user, as_pgn=True)
-        games_list = list(req)
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+        ) as progress:
+            task = progress.add_task("Fetching games from lichess.org...", total=None)
+
+            for game in req:
+                games_list.append(game)
+                progress.update(task, advance=1)
     except requests.exceptions.ConnectionError:
         print(
             "ERROR:   Unable to connect to lichess.org. Please check your internet connection."
@@ -344,16 +378,38 @@ def fetch(ctx, site):
     if site == "chess":
         print(f"INFO:    Fetching games for {user} from chess.com")
         games = fetch_chess_dotcom_games(user)
-        for game in games:
-            pgn_dict = build_pgn_dict(game["pgn"])
-            save_game_to_db(db_conn, pgn_dict)
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+        ) as progress:
+            task = progress.add_task("Saving games to database...", total=len(games))
+
+            for game in games:
+                pgn_dict = build_pgn_dict(game["pgn"])
+                save_game_to_db(db_conn, pgn_dict)
+                progress.update(task, advance=1)
 
     elif site == "lichess":
         print(f"INFO:    Fetching games for {user} from lichess.org")
         games = fetch_lichess_org_games(user)
-        for game in games:
-            pgn_dict = build_pgn_dict(game)
-            save_game_to_db(db_conn, pgn_dict)
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            TimeRemainingColumn(),
+        ) as progress:
+            task = progress.add_task("Saving games to database...", total=len(games))
+
+            for game in games:
+                pgn_dict = build_pgn_dict(game)
+                save_game_to_db(db_conn, pgn_dict)
+                progress.update(task, advance=1)
 
     else:
         raise ValueError(
@@ -376,11 +432,23 @@ def save(ctx, folder):
 
     print(f"INFO:    Fetching games from folder: {folder_path}")
 
-    for pgn in folder_path.glob("*.pgn"):
-        with pgn.open() as f:
-            pgn_text = f.read()
-            pgn_dict = build_pgn_dict(pgn_text)
-            save_game_to_db(db_conn, pgn_dict)
+    pgn_files = list(folder_path.glob("*.pgn"))
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeRemainingColumn(),
+    ) as progress:
+        task = progress.add_task("Processing PGN files...", total=len(pgn_files))
+
+        for pgn in pgn_files:
+            with pgn.open() as f:
+                pgn_text = f.read()
+                pgn_dict = build_pgn_dict(pgn_text)
+                save_game_to_db(db_conn, pgn_dict)
+            progress.update(task, advance=1)
 
     print(f"INFO:    Games saved to {output}")
 

@@ -26,6 +26,7 @@ dependencies = [
     "berserk>=0.14.0",
     "click>=8.3.0",
     "requests>=2.32.5",
+    "rich>=13.0.0",
 ]
 
 [project.scripts]
@@ -40,5 +41,5 @@ Issues = "https://github.com/EndlessTrax/pgn-to-sqlite/issues"
 dev = [
     "pytest",
     "pytest-cov",
-    "ruff"
+    "ruff",
 ]
