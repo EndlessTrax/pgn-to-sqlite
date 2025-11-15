@@ -39,7 +39,8 @@ Issues = "https://github.com/EndlessTrax/pgn-to-sqlite/issues"
 
 [dependency-groups]
 dev = [
+    "isort>=7.0.0",
     "pytest",
     "pytest-cov",
-    "ruff"
+    "ruff",
 ]
