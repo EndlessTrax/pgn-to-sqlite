@@ -1,6 +1,7 @@
 import re
 import sqlite3
 from pathlib import Path
+from typing import Optional
 
 import berserk
 import click
@@ -37,8 +38,7 @@ def create_db_connection(path: str):
 
     return connection
 
-
-def execute_db_query(connection, query: str, values: tuple = None) -> None:
+def execute_db_query(connection, query: str, values: Optional[tuple] = None) -> None:
     """Executes a SQL query on the Sqlite3 database
 
     Args:
@@ -116,29 +116,35 @@ def fetch_chess_dotcom_games(user: str) -> list:
         )
         req.raise_for_status()
     except requests.exceptions.ConnectionError:
-        print("ERROR:   Unable to connect to chess.com. Please check your internet connection.")
+        print(
+            "ERROR:   Unable to connect to chess.com. Please check your internet connection."
+        )
         raise click.Abort()
     except requests.exceptions.Timeout:
         print("ERROR:   Request to chess.com timed out. Please try again later.")
         raise click.Abort()
     except requests.exceptions.HTTPError as e:
         if req.status_code == 404:
-            print(f"ERROR:   User '{user}' not found on chess.com. Please check the username.")
+            print(
+                f"ERROR:   User '{user}' not found on chess.com. Please check the username."
+            )
         elif req.status_code == 429:
-            print("ERROR:   Rate limit exceeded. Please wait a few minutes and try again.")
+            print(
+                "ERROR:   Rate limit exceeded. Please wait a few minutes and try again."
+            )
         else:
             print(f"ERROR:   HTTP error occurred: {e}")
         raise click.Abort()
     except requests.exceptions.RequestException as e:
         print(f"ERROR:   An error occurred while fetching data from chess.com: {e}")
         raise click.Abort()
-    
+
     try:
         archive_urls = req.json()["archives"]
     except (ValueError, KeyError) as e:
         print("ERROR:   Received invalid data from chess.com API.")
         raise click.Abort()
-    
+
     games_list = []
 
     for url in archive_urls:
@@ -146,7 +152,7 @@ def fetch_chess_dotcom_games(user: str) -> list:
             archived_games_req = requests.get(url, timeout=30)
             archived_games_req.raise_for_status()
             archived_games = archived_games_req.json()["games"]
-            
+
             for game in archived_games:
                 games_list.append(game)
         except requests.exceptions.RequestException as e:
@@ -174,17 +180,23 @@ def fetch_lichess_org_games(user: str) -> list:
         req = client.games.export_by_player(user, as_pgn=True)
         games_list = list(req)
     except requests.exceptions.ConnectionError:
-        print("ERROR:   Unable to connect to lichess.org. Please check your internet connection.")
+        print(
+            "ERROR:   Unable to connect to lichess.org. Please check your internet connection."
+        )
         raise click.Abort()
     except requests.exceptions.Timeout:
         print("ERROR:   Request to lichess.org timed out. Please try again later.")
         raise click.Abort()
     except requests.exceptions.HTTPError as e:
-        if hasattr(e, 'response') and e.response is not None:
+        if hasattr(e, "response") and e.response is not None:
             if e.response.status_code == 404:
-                print(f"ERROR:   User '{user}' not found on lichess.org. Please check the username.")
+                print(
+                    f"ERROR:   User '{user}' not found on lichess.org. Please check the username."
+                )
             elif e.response.status_code == 429:
-                print("ERROR:   Rate limit exceeded. Please wait a few minutes and try again.")
+                print(
+                    "ERROR:   Rate limit exceeded. Please wait a few minutes and try again."
+                )
             else:
                 print(f"ERROR:   HTTP error occurred: {e}")
         else:
